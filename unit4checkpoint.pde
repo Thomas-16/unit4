@@ -6,13 +6,16 @@ color[] colors = { color(244,220,38), color(233,41,41), color(92,54,19), color(0
 void setup() {
   
   size(800, 800);
-  background(255);
+  background(242,227,199);
   
-  ear(400 + 130, 370 + -150, 1);
-  
-  head(400, 370);
+  pikachu(400, 410);
 }
 
+void pikachu(int x, int y) {
+  ear(x + 130, y + -150, 1);
+  ear(-x + 130, y + -150, -1);
+  head(x, y);
+}
 void head(int x, int y) {
   pushMatrix();
   translate(x, y);
@@ -82,8 +85,8 @@ void cheek(int x, int y, float rotation) {
 }
 void mouth(int x, int y, int scale) {
   pushMatrix();
-  scale(scale,1);
   translate(x, y);
+  scale(scale,1);
   
   stroke(0);
   strokeWeight(2);
