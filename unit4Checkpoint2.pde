@@ -7,16 +7,10 @@ void setup() {
   
   size(800, 800);
   background(242,227,199);
-  
-  int x = 110;
-  int y = 120;
-  for(int i = 0; i < 16; i++) {
-    pikachu(x, y, 0.25, color(random(0, 255), random(0, 255), random(0, 255)), random(-PI/10, PI/10));
-    
-    x += 200;
-    if(x >= 900) {
-      x = 110;
-      y += 190;
+
+  for(int x = 110; x < 800; x += 200) {
+    for(int y = 120; y < 800; y += 190) {
+      pikachu(x, y, 0.25, color(random(0, 255), random(0, 255), random(0, 255)), random(-PI/10, PI/10));
     }
   }
 }
@@ -38,7 +32,7 @@ void head(int x, int y, color mainColor) {
   translate(x, y);
   
   stroke(0);
-  strokeWeight(4);
+  strokeWeight(6);
   fill(mainColor);
   
   circle(0, 0, 460);
@@ -50,8 +44,9 @@ void head(int x, int y, color mainColor) {
   
   nose(0, 8);
   
-  cheek(160, 85, PI/7f);
-  cheek(-160, 85, -PI/7f);
+  color cheekColor = color(random(0, 255), random(0, 255), random(0, 255));
+  cheek(160, 85, PI/7f, cheekColor);
+  cheek(-160, 85, -PI/7f, cheekColor);
   
   mouth(0, 90, 1);
   mouth(0, 90, -1);
@@ -87,14 +82,14 @@ void nose(int x, int y) {
   
   popMatrix();
 }
-void cheek(int x, int y, float rotation) {
+void cheek(int x, int y, float rotation, color cheekColor) {
   pushMatrix();
   translate(x, y);
   rotate(rotation);
   
   stroke(0);
   strokeWeight(4);
-  fill(colors[1]);
+  fill(cheekColor);
   
   ellipse(0, 0, 100, 130);
   
@@ -122,7 +117,7 @@ void ear(int x, int y, int scale, color mainColor) {
   translate(x, y);
   
   stroke(0);
-  strokeWeight(4);
+  strokeWeight(6);
   fill(mainColor);
   
   beginShape();
