@@ -14,15 +14,30 @@ color[] planetColors = {
   color(220, 120, 100) 
 };
 
+color[] starGlowColors = {
+  color(200, 220, 255),
+  color(255, 182, 140),
+  color(255, 151, 82),
+  color(224, 50, 40)
+};
+
+PGraphics backgroundPG;
+
 void setup() {
   size(1200, 800);
-  background(15, 25, 35);
+  backgroundPG = createGraphics(1200, 800);
+  backgroundPG.beginDraw();
+  backgroundPG.background(15, 25, 35);
   
   
   // Draw stars
-  for (int i = 0; i < 300; i++) {
+  // stars are drawn in backgroundPG
+  for (int i = 0; i < 550; i++) {
     drawStar((int)random(width), (int)random(height));
   }
+  backgroundPG.endDraw();
+  backgroundPG.filter(BLUR, 1);
+  image(backgroundPG, 0, 0);
   
   // Draw planets
   for (int i = 0; i < (int)random(4, 6); i++) {
@@ -37,38 +52,38 @@ void setup() {
 }
 
 void drawStar(int x, int y) {
-  pushMatrix();
-  translate(x, y);
+  backgroundPG.pushMatrix();
+  backgroundPG.translate(x, y);
   
   float starSize = random(1, 3);
   int points = (int)random(4, 8);
+
+  color coreColor = color(255, 255, 210);
+  color glowColor = starGlowColors[(int)random(starGlowColors.length)];
   
-  // White-yellow star colors
-  color coreColor = color(255, 255, 200);
-  color glowColor = color(200, 220, 255);
-  
-  fill(coreColor);
-  noStroke();
+  backgroundPG.fill(coreColor);
+  backgroundPG.noStroke();
   drawStarCore(points, starSize);
-  drawStarGlow(starSize * 3, glowColor);
+  drawStarGlow(starSize * 3.5, glowColor);
   
-  popMatrix();
+  backgroundPG.popMatrix();
 }
 void drawStarCore(int points, float size) {
   float angle = TWO_PI / points;
-  beginShape();
+  backgroundPG.beginShape();
   for (float a = 0; a < TWO_PI; a += angle) {
-    float sx = cos(a) * size;
-    float sy = sin(a) * size;
-    vertex(sx, sy);
+    float pointOffset = random(0.95, 1.05);
+    float vertexX = cos(a) * size * pointOffset;
+    float vertexY = sin(a) * size * pointOffset;
+    backgroundPG.vertex(vertexX, vertexY);
   }
-  endShape(CLOSE);
+  backgroundPG.endShape(CLOSE);
 }
 
 void drawStarGlow(float size, color glowColor) {
-  for (int i = 0; i < 3; i++) {
-    fill(red(glowColor), green(glowColor), blue(glowColor), 20 + i*10);
-    ellipse(0, 0, size - i*5, size - i*5);
+  for (int i = 0; i < 4; i++) {
+    backgroundPG.fill(red(glowColor), green(glowColor), blue(glowColor), 10 + i*10);
+    backgroundPG.circle(0, 0, size - i*5);
   }
 }
 
@@ -81,7 +96,7 @@ void drawPlanet(int x, int y, int size, float rotation) {
   boolean hasRings = random(1) > 0.6;
   
   drawPlanetBody(size, planetColor);
-  
+  drawPlanetDetails(size, planetColor);
   
   popMatrix();
 }
@@ -91,6 +106,22 @@ void drawPlanetBody(int size, color planetColor) {
   noStroke();
   
   ellipse(0, 0, size, size * 0.97);
+}
+void drawPlanetDetails(float size, color c) {
+  // craters
+  for (int i = 0; i < (int)random(8, 15); i++) {
+    pushMatrix();
+    float x = random(-size * 0.35, size * 0.35);
+    float y = random(-size * 0.35, size * 0.35);
+    translate(x, y);
+    rotate(random(2 * PI));
+    scale(map(dist(0,0,x,y), 0, size/2, 1, 0.5));
+    colorMode(HSB, 360, 100, 100);
+    fill(hue(c), saturation(c), brightness(c) - 20);
+    colorMode(RGB, 255, 255, 255);
+    ellipse(0, 0, random(8, size/8), random(8, size/8));
+    popMatrix();
+  }
 }
 
 void drawComet(int x, int y, float speed) {
