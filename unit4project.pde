@@ -23,32 +23,63 @@ color[] starGlowColors = {
 
 PGraphics backgroundPG;
 
+ArrayList<PVector> planetPositions = new ArrayList<PVector>();
+
 void setup() {
   size(1200, 800);
   backgroundPG = createGraphics(1200, 800);
   backgroundPG.beginDraw();
   backgroundPG.background(15, 25, 35);
   
+  drawStarDust();
   
   // Draw stars
   // stars are drawn in backgroundPG
-  for (int i = 0; i < 550; i++) {
+  for (int i = 0; i < 380; i++) {
     drawStar((int)random(width), (int)random(height));
   }
   backgroundPG.endDraw();
-  backgroundPG.filter(BLUR, 1);
+  backgroundPG.filter(BLUR, 0.7);
   image(backgroundPG, 0, 0);
+  
+  // Draw comets
+  for (int i = 0; i < (int)random(4, 5); i++) {
+    drawComet((int)random(width), (int)random(height));
+  }
   
   // Draw planets
   for (int i = 0; i < (int)random(4, 6); i++) {
-    drawPlanet((int)random(80, width-80), (int)random(200, height-80), (int)random(80, 200), radians(random(-10, 10)));
+    int x = (int)random(80, width-80);
+    int y = (int)random(200, height-80);
+    
+    while(planetPositions.size() != 0 && !isVectorWithinRangeOfVectors(planetPositions, new PVector(x,y), 200)) {
+      x = (int)random(80, width-80);
+      y = (int)random(200, height-80);
+    }
+    
+    drawPlanet(x, y, (int)random(120, 200), radians(random(-10, 10)));
   }
   
-  // Draw comets
-  for (int i = 0; i < (int)random(4, 6); i++) {
-    drawComet((int)random(width), (int)random(height), random(0.5, 2));
+}
+
+// random stars with less details everywhere
+void drawStarDust() {
+  for (int i = 0; i < 5000; i++) {
+    float x = random(width);
+    float y = random(height);
+    float alpha = random(50, 200);
+    float size = random(0.5, 2.4);
+    
+    color c = color(255, 245, 220);
+    backgroundPG.noStroke();
+    if (random(100) < 5) {
+      backgroundPG.fill(c, alpha*3);
+      backgroundPG.ellipse(x, y, size*2, size*2);
+    } else {
+      backgroundPG.fill(c, alpha);
+      backgroundPG.ellipse(x, y, size, size);
+    }
   }
-  
 }
 
 void drawStar(int x, int y) {
@@ -61,16 +92,16 @@ void drawStar(int x, int y) {
   color coreColor = color(255, 255, 210);
   color glowColor = starGlowColors[(int)random(starGlowColors.length)];
   
-  backgroundPG.fill(coreColor);
-  backgroundPG.noStroke();
-  drawStarCore(points, starSize);
-  drawStarGlow(starSize * 3.5, glowColor);
+  drawStarCore(points, starSize, coreColor);
+  drawStarGlow(starSize * random(3, 4), glowColor);
   
   backgroundPG.popMatrix();
 }
-void drawStarCore(int points, float size) {
+void drawStarCore(int points, float size, color coreColor) {
   float angle = TWO_PI / points;
   backgroundPG.beginShape();
+  backgroundPG.fill(coreColor);
+  backgroundPG.noStroke();
   for (float a = 0; a < TWO_PI; a += angle) {
     float pointOffset = random(0.95, 1.05);
     float vertexX = cos(a) * size * pointOffset;
@@ -81,8 +112,8 @@ void drawStarCore(int points, float size) {
 }
 
 void drawStarGlow(float size, color glowColor) {
-  for (int i = 0; i < 4; i++) {
-    backgroundPG.fill(red(glowColor), green(glowColor), blue(glowColor), 10 + i*10);
+  for (int i = 0; i < 5; i++) {
+    backgroundPG.fill(red(glowColor), green(glowColor), blue(glowColor), i*15);
     backgroundPG.circle(0, 0, size - i*5);
   }
 }
@@ -124,11 +155,44 @@ void drawPlanetDetails(float size, color c) {
   }
 }
 
-void drawComet(int x, int y, float speed) {
+void drawComet(int x, int y) {
   pushMatrix();
   translate(x, y);
+  rotate(random(2 * PI));
   
-  
+  float tipSize = random(10, 20);
+  noStroke();
+  drawCometTail(tipSize);
+  drawCometTip(tipSize);
   
   popMatrix();
+}
+void drawCometTip(float tipSize) {
+  fill(255, 255, 220);
+  circle(0, 0, tipSize);
+  // layers of glow
+  for (int i = 0; i < 7; i++) {
+    fill(255, 255, 255, 50 - i*8);
+    circle(0, 0, tipSize + i*4);
+  }
+}
+void drawCometTail(float maxSize) {
+  color tailColor = color(150, 200, 255, 150);
+  float tailLength = random(50, 180);
+  for (int i = 0; i < tailLength; i++) {
+    float alpha = map(i, 0, tailLength, 50, 0);
+    float size = map(i, 0, tailLength, maxSize, maxSize / 6);
+    fill(tailColor, alpha);
+    circle(-i * 1.5, 0, size);
+  }
+}
+
+// helper
+boolean isVectorWithinRangeOfVectors(ArrayList<PVector> positions, PVector position, float distance) {
+  for(PVector pos : positions) {
+    if(dist(pos.x, pos.y, position.x, position.y) < distance) {
+      return true;
+    }
+  }
+  return false;
 }
