@@ -124,7 +124,7 @@ void drawPlanet(int x, int y, int size, float rotation) {
   rotate(rotation);
   
   color planetColor = planetColors[(int)random(planetColors.length)];
-  boolean hasRings = random(1) > 0.6;
+  boolean hasRings = random(1) > 0.7;
   
   drawPlanetBody(size, planetColor);
   drawPlanetDetails(size, planetColor);
@@ -142,15 +142,16 @@ void drawPlanetDetails(float size, color c) {
   // craters
   for (int i = 0; i < (int)random(8, 15); i++) {
     pushMatrix();
-    float x = random(-size * 0.35, size * 0.35);
-    float y = random(-size * 0.35, size * 0.35);
+    float x = random(-size * 0.3, size * 0.3);
+    float y = random(-size * 0.3, size * 0.3);
     translate(x, y);
     rotate(random(2 * PI));
     scale(map(dist(0,0,x,y), 0, size/2, 1, 0.5));
     colorMode(HSB, 360, 100, 100);
     fill(hue(c), saturation(c), brightness(c) - 20);
     colorMode(RGB, 255, 255, 255);
-    ellipse(0, 0, random(8, size/8), random(8, size/8));
+    float craterSize = random(10, 30);
+    ellipse(0, 0, craterSize, craterSize * random(0.7, 1.3));
     popMatrix();
   }
 }
