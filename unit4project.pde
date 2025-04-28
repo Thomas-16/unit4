@@ -82,7 +82,11 @@ void setup() {
 
 void drawNebula(color startCol, color endCol, float noiseScale) {
   backgroundPG.noStroke();
+  noiseSeed(6);
+  
   float noiseOffset = random(1000);
+  //float noiseOffset = 86.3325;
+  println(noiseOffset);
   
   for(int i = 0; i < 40000; i++) {
     float x = random(width);
@@ -101,7 +105,7 @@ void drawNebula(color startCol, color endCol, float noiseScale) {
 
 // random stars with less details everywhere
 void drawStarDust() {
-  for (int i = 0; i < 7000; i++) {
+  for (int i = 0; i < 8000; i++) {
     float x = random(width);
     float y = random(height);
     float alpha = random(50, 200);
@@ -149,9 +153,9 @@ void drawStarCore(int points, float size, color coreColor) {
 }
 
 void drawStarGlow(float size, color glowColor) {
-  for (int i = 0; i < 5; i++) {
-    backgroundPG.fill(red(glowColor), green(glowColor), blue(glowColor), i*15);
-    backgroundPG.circle(0, 0, size - i*5);
+  for (int i = 0; i < 6; i++) {
+    backgroundPG.fill(red(glowColor), green(glowColor), blue(glowColor), i*10);
+    backgroundPG.circle(0, 0, size - i*3);
   }
 }
 
